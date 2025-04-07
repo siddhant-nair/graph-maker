@@ -70,21 +70,29 @@ function NodeGraph() {
       return
     }
 
-    if (selectedNode === null) {
-      setSelectedNode(nodeId)
-    } else {
-      if(selectedNode != nodeId){
-        handleAddConnection(
-          selectedNode, 
-          nodeId, 
-          connections, 
-          setConnections, 
-          nodes,
-          setNodes
-        )
+    if (connectionMode) {
+      if (selectedNode === null) {
         setSelectedNode(nodeId)
+      } else {
+        if (selectedNode != nodeId) {
+          handleAddConnection(
+            selectedNode,
+            nodeId,
+            connections,
+            setConnections,
+            nodes,
+            setNodes
+          )
+          setSelectedNode(nodeId)
+        }
       }
     }
+
+    if(deletionMode){
+      if(selectedNode == null){}
+      else {}
+    }
+
   }
 
   function renderNodes() {
