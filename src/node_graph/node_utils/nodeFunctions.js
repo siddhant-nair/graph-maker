@@ -1,7 +1,6 @@
-import { Circle, Group, Text } from "react-konva";
-
 export function createNode(x, y, nodes, setNodes) {
-    const newNodeId = nodes.length + 1;
+    const newNodeId = Object.keys(nodes).length;
+    // console.log(nodes)
     const newNode = {
         id: newNodeId,
         x: x,
@@ -10,21 +9,32 @@ export function createNode(x, y, nodes, setNodes) {
         fill: '#fff',
         connections: []
     };
-
-    setNodes([...nodes, newNode]);
+    setNodes({
+        ...nodes,
+        [ newNodeId ]: newNode
+    });
 };
 
 export function handleNodeDrag(e, nodeId, nodes, setNodes) {
-    const updatedNodes = nodes.map(node => {
-        if (node.id === nodeId) {
-            return {
-                ...node,
-                x: e.target.x(),
-                y: e.target.y()
-            };
+    // const updatedNodesOld = nodes.map(node => {
+    //     if (node.id === nodeId) {
+    //         return {
+    //             ...node,
+    //             x: e.target.x(),
+    //             y: e.target.y()
+    //         };
+    //     }
+    //     return node;
+    // });
+
+    const updatedNodes = {
+        ...nodes,
+        [nodeId]: {
+            ...nodes[nodeId],
+            x: e.target.x(),
+            y: e.target.y(),
         }
-        return node;
-    });
+    }
 
     setNodes(updatedNodes);
 };
