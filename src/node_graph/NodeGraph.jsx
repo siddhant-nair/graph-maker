@@ -178,13 +178,13 @@ function NodeGraph() {
           onClick={toggleConnectionMode}
         >
           <div className={`size-7 ${connectionMode ? 'bg-green-500' : 'bg-red-600'}  rounded-full`}></div>
-          <div className='text-sm text-white'>Connection <br /> {connectionMode ? 'On' : 'Off'}</div>
+          <div className='text-sm text-white'>Connection <br /> {connectionMode ? 'On' : 'Off'} (a)</div>
         </div>
         <div className='flex flex-col gap-2 text-center items-center'
           onClick={toggleDeletionMode}
         >
           <div className={`size-7 ${deletionMode ? 'bg-green-500' : 'bg-red-600'}  rounded-full`}></div>
-          <div className='text-sm text-white'>Deletion <br /> {deletionMode ? 'On' : 'Off'}</div>
+          <div className='text-sm text-white'>Deletion <br /> {deletionMode ? 'On' : 'Off'} (d)</div>
         </div>
       </div>
     </>

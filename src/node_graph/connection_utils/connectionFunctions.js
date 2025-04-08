@@ -9,7 +9,7 @@ export function handleAddConnection(
     if (connections.hasOwnProperty(`${fromId}-${toId}`) ||
         connections.hasOwnProperty(`${toId}-${fromId}`)) {
 
-        var newConnections = connections
+        var newConnections = { ...connections }
 
         delete newConnections[`${fromId}-${toId}`]
         delete newConnections[`${toId}-${fromId}`]
@@ -19,6 +19,18 @@ export function handleAddConnection(
         const connectionsFrom = [...nodes[fromId].connections].filter((val) => val != toId)
         const connectionsTo = [...nodes[toId].connections].filter((val) => val != fromId)
         
+
+        setNodes({
+            ...nodes,
+            [fromId]: {
+                ...nodes[fromId],
+                connections: connectionsFrom
+            },
+            [toId]: {
+                ...nodes[toId],
+                connections: connectionsTo
+            },
+        })
         console.log(fromId, [...nodes[fromId].connections], connectionsFrom)
         return
     }

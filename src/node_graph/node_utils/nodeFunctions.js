@@ -15,6 +15,26 @@ export function createNode(x, y, nodes, setNodes) {
     });
 };
 
+export function deleteNode(nodeId, connections, setConnections, nodes, setNodes) {
+    var allConn = nodes[nodeId].connections
+    var updatedConnections = {...connections}
+    var updatedNodes = {...nodes}
+
+    allConn.forEach(node => {
+        var connectionWithDelete = updatedNodes[node.id].connections.filter(nodeName => nodeName != nodeId)
+        updatedNodes[node.id].connections = connectionWithDelete;
+
+        delete updatedConnections[`${node.id}-${nodeId}`];
+        delete updatedConnections[`${nodeId}-${node.id}`];
+
+    });
+
+    delete updatedNodes[nodeId]
+
+    setNodes(updatedNodes)
+    setConnections(updatedConnections)
+}
+
 export function handleNodeDrag(e, nodeId, nodes, setNodes) {
     // const updatedNodesOld = nodes.map(node => {
     //     if (node.id === nodeId) {
