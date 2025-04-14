@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Circle, Group, Text, Line } from 'react-konva';
-import { createNode, handleNodeDrag, nodeSelectionTween } from './node_utils/nodeFunctions';
+import { createNode, deleteNode, handleNodeDrag, nodeSelectionTween } from './node_utils/nodeFunctions';
 import { handleAddConnection } from './connection_utils/connectionFunctions';
 
 function NodeGraph() {
@@ -21,21 +21,19 @@ function NodeGraph() {
 
   function toggleDeletionMode() {
     setConnectionMode(false)
+    setSelectedNode(null)
     setDeletionMode(val => !val)
+    // console.log(deletionMode)
   }
 
   function toggleModes(e) {
 
     if (e.key == 'a') {
-      setDeletionMode(false)
-      setSelectedNode(null)
-      setConnectionMode(val => !val)
+      toggleConnectionMode()
     }
 
     if (e.key == 'd') {
-      setConnectionMode(false)
-      setSelectedNode(null)
-      setDeletionMode(val => !val)      
+      toggleDeletionMode()
     }
 
   }
@@ -66,7 +64,8 @@ function NodeGraph() {
   };
 
   function handleNodeClick(nodeId) {
-    if(!connectionMode){
+    console.log(deletionMode)
+    if(!connectionMode && !deletionMode){
       return
     }
 
@@ -89,8 +88,16 @@ function NodeGraph() {
     }
 
     if(deletionMode){
-      if(selectedNode == null){}
-      else {}
+      console.log('deletionMode')
+      if(selectedNode == null || selectedNode != nodeId){
+        setSelectedNode(nodeId)
+      }
+      else {
+        deleteNode(nodeId, connections, setConnections, nodes, setNodes)        
+        setSelectedNode(null)
+        console.log(nodes)
+        console.log(connections)
+      }
     }
 
   }

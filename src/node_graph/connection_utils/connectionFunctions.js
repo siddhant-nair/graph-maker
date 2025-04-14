@@ -59,6 +59,6 @@ export function handleAddConnection(
     })
 
     setConnections({ ...connections, [`${fromId}-${toId}`]: newConn })
-    console.log(connections)
-    console.log(nodes)
+    // console.log(connections)
+    // console.log(nodes)
 }

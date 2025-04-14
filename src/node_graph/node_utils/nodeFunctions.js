@@ -20,12 +20,15 @@ export function deleteNode(nodeId, connections, setConnections, nodes, setNodes)
     var updatedConnections = {...connections}
     var updatedNodes = {...nodes}
 
-    allConn.forEach(node => {
-        var connectionWithDelete = updatedNodes[node.id].connections.filter(nodeName => nodeName != nodeId)
-        updatedNodes[node.id].connections = connectionWithDelete;
+    console.log(allConn)
+    console.log(updatedNodes)
 
-        delete updatedConnections[`${node.id}-${nodeId}`];
-        delete updatedConnections[`${nodeId}-${node.id}`];
+    allConn.forEach(node => {
+        var connectionWithDelete = updatedNodes[node].connections.filter(nodeName => nodeName != nodeId)
+        updatedNodes[node].connections = connectionWithDelete;
+
+        delete updatedConnections[`${node}-${nodeId}`];
+        delete updatedConnections[`${nodeId}-${node}`];
 
     });
 
