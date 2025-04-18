@@ -65,11 +65,14 @@ function NodeGraph() {
 
   function handleNodeClick(nodeId) {
     console.log(deletionMode)
-    if(!connectionMode && !deletionMode){
-      return
-    }
+    // if(!connectionMode && !deletionMode){
+    //   return
+    // }
 
-    if (connectionMode) {
+    if (!deletionMode) {
+      if (!connectionMode) {
+        toggleConnectionMode()
+      }
       if (selectedNode === null) {
         setSelectedNode(nodeId)
       } else {
@@ -87,19 +90,18 @@ function NodeGraph() {
       }
     }
 
-    if(deletionMode){
+    if (deletionMode) {
       console.log('deletionMode')
-      if(selectedNode == null || selectedNode != nodeId){
+      if (selectedNode == null || selectedNode != nodeId) {
         setSelectedNode(nodeId)
       }
       else {
-        deleteNode(nodeId, connections, setConnections, nodes, setNodes)        
+        deleteNode(nodeId, connections, setConnections, nodes, setNodes)
         setSelectedNode(null)
         console.log(nodes)
         console.log(connections)
       }
     }
-
   }
 
   function renderNodes() {
@@ -113,7 +115,7 @@ function NodeGraph() {
         x={node.x}
         y={node.y}
         draggable
-        onClick={() => { handleNodeClick(node.id)}}
+        onClick={() => { handleNodeClick(node.id) }}
         onDragMove={(e) => handleNodeDrag(e, node.id, nodes, setNodes)}
         onMouseOver={() => {
           const hoveredNode = nodeLayer.current.find(`.circle${node.id}`);
@@ -128,7 +130,7 @@ function NodeGraph() {
           name={`circle${node.id}`}
           radius={node.radius}
           fill={node.fill}
-          stroke={ 'red'}
+          stroke={'red'}
           strokeWidth={Number(node.id == selectedNode) && 3}
           perfectDrawEnabled={false}
 
@@ -150,12 +152,26 @@ function NodeGraph() {
     // console.log(connections)
     // return connections.map(conn => {
     return Object.entries(connections).map(([id, conn]) => (
-      <Line
+      <Group
         key={conn.id}
-        points={[nodes[conn.from].x, nodes[conn.from].y, nodes[conn.to].x, nodes[conn.to].y]}
-        stroke={conn.stroke}
-        strokeWidth={conn.strokeWidth}
-      />
+      >
+        <Line
+          key={conn.id}
+          onClick={() => { }}
+          points={[nodes[conn.from].x, nodes[conn.from].y, nodes[conn.to].x, nodes[conn.to].y]}
+          stroke={conn.stroke}
+          strokeWidth={conn.strokeWidth}
+        />
+        <Text
+          text={conn.weight.toString()}
+          fontSize={12}
+          fill="white"
+          fontVariant='bold'
+          x={(nodes[conn.from].x + nodes[conn.to].x) / 2}
+          y={(nodes[conn.from].y + nodes[conn.to].y) / 2 - 15}
+          listening={false}
+        />
+      </Group>
     )
     )
   }

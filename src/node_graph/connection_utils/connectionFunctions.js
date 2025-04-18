@@ -40,6 +40,7 @@ export function handleAddConnection(
         from: fromId,
         to: toId,
         stroke: 'black',
+        weight: 1,
         strokeWidth: 3,
     }
 
@@ -61,4 +62,8 @@ export function handleAddConnection(
     setConnections({ ...connections, [`${fromId}-${toId}`]: newConn })
     // console.log(connections)
     // console.log(nodes)
+}
+
+export function setConnectionWeight(){
+
 }
