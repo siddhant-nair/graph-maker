@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Circle, Group, Text, Line } from 'react-konva';
+import { Stage, Layer, Circle, Group, Text, Line, Rect } from 'react-konva';
 import { createNode, deleteNode, handleNodeDrag, nodeSelectionTween } from './node_utils/nodeFunctions';
 import { handleAddConnection } from './connection_utils/connectionFunctions';
 
@@ -10,8 +10,12 @@ function NodeGraph() {
   const [connectionMode, setConnectionMode] = useState(false)
   const [deletionMode, setDeletionMode] = useState(false)
 
+  const [connectionHovered, setConnectionHovered] = useState(false)
+  const [inputState, setInputState] = useState({x: 0, y: 0, position: "hidden", value: 0})
+
   const stageRef = useRef(null);
   const nodeLayer = useRef(null);
+  const inputRef = useRef(null)
 
   function toggleConnectionMode() {
     setDeletionMode(false)
@@ -57,9 +61,11 @@ function NodeGraph() {
       const pointerPosition = stage.getPointerPosition();
       createNode(pointerPosition.x, pointerPosition.y, nodes, setNodes);
     } else {
+      setInputState({x:0, y:0, position: "hidden", value: 0})
       setConnectionMode(false)
       setSelectedNode(null)
       setDeletionMode(false)
+
     }
   };
 
@@ -151,31 +157,67 @@ function NodeGraph() {
   function renderConnections() {
     // console.log(connections)
     // return connections.map(conn => {
-    return Object.entries(connections).map(([id, conn]) => (
+    return Object.entries(connections).map(([id, conn]) => {
+      let xPosi = (nodes[conn.from].x + nodes[conn.to].x) / 2
+      let yPosi = (nodes[conn.from].y + nodes[conn.to].y) / 2 - 15
+
+      let isHovered = connectionHovered == conn.id
+
+      return (
       <Group
         key={conn.id}
-      >
+        // onClick={() => console.log('clicked text')}
+        >
+        <Rect
+          onMouseOver={() => {
+            setConnectionHovered(conn.id)
+            // console.log('hover triggered')
+          }}
+          onMouseLeave={() => {
+            setConnectionHovered(null)
+            // console.log('hover triggered')
+          }}
+
+          onClick={(e) => {
+            console.log(e)
+            // console.log(e.evt.clientX, e.evt.clientY)
+            setInputState({
+              x: e.evt.clientX,
+              y: e.evt.clientY,
+              position: "absolute",
+              value: conn.weight
+            })
+
+            inputRef.current.focus()
+          }}
+          height={24}
+          width={24}
+          fill={'#4a5565'}
+          // fill={'red'}
+          x={xPosi - 9}
+          y={yPosi - 6}
+        />
         <Line
           key={conn.id}
-          onClick={() => { }}
           points={[nodes[conn.from].x, nodes[conn.from].y, nodes[conn.to].x, nodes[conn.to].y]}
           stroke={conn.stroke}
           strokeWidth={conn.strokeWidth}
-        />
+          />
         <Text
           text={conn.weight.toString()}
-          fontSize={12}
+          fontSize={isHovered ? 24 : 12}
           fill="white"
           fontVariant='bold'
-          x={(nodes[conn.from].x + nodes[conn.to].x) / 2}
-          y={(nodes[conn.from].y + nodes[conn.to].y) / 2 - 15}
+          x={xPosi - (isHovered ? 3 : 0)}
+          y={yPosi - (isHovered ? 6 : 0)}
           listening={false}
         />
       </Group>
     )
+  }
     )
   }
-
+  
   return (
     <>
       <Stage
@@ -196,6 +238,28 @@ function NodeGraph() {
       </Stage>
 
       {/* Non Canvas */}
+      <input type="number" name="weight-input" ref={inputRef}
+        className={`absolute origin-center w-[36px] h-[36px] 
+          text-white bg-gray-600 font-bold border-2 border-white text-center
+          text-[12px]`}
+        onChange={(e) => {
+          console.log(e.target.value)
+          setInputState({
+            ...inputState,
+            value: e.target.value,
+          })
+        }
+        }
+        autoFocus
+        onSU
+        placeholder={inputState.value}
+        style={{
+          top: inputState.y - 18,
+          left: inputState.x - 18,
+          position: inputState.position,
+          
+        }}
+      />
       <div className='absolute m-5 top-0 left-0 gap-10 flex w-fit'>
         <div className='flex flex-col gap-2 text-center items-center'
           onClick={toggleConnectionMode}

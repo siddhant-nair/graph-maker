@@ -65,5 +65,5 @@ export function handleAddConnection(
 }
 
 export function setConnectionWeight(){
-
+    
 }
