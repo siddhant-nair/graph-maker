@@ -11,7 +11,12 @@ function NodeGraph() {
   const [deletionMode, setDeletionMode] = useState(false)
 
   const [connectionHovered, setConnectionHovered] = useState(false)
-  const [inputState, setInputState] = useState({x: 0, y: 0, position: "hidden", value: 0})
+  const [inputState, setInputState] = useState({
+    x: 0, y: 0, 
+    display: "none", 
+    value: 0, 
+    connectionId: '0-0',
+  })
 
   const stageRef = useRef(null);
   const nodeLayer = useRef(null);
@@ -61,11 +66,10 @@ function NodeGraph() {
       const pointerPosition = stage.getPointerPosition();
       createNode(pointerPosition.x, pointerPosition.y, nodes, setNodes);
     } else {
-      setInputState({x:0, y:0, position: "hidden", value: 0})
+      setInputState({x:0, y:0, display: "none", value: 0, connectionId: null})
       setConnectionMode(false)
       setSelectedNode(null)
       setDeletionMode(false)
-
     }
   };
 
@@ -139,7 +143,6 @@ function NodeGraph() {
           stroke={'red'}
           strokeWidth={Number(node.id == selectedNode) && 3}
           perfectDrawEnabled={false}
-
         />
         <Text
           text={node.id.toString()}
@@ -184,15 +187,16 @@ function NodeGraph() {
             setInputState({
               x: e.evt.clientX,
               y: e.evt.clientY,
-              position: "absolute",
-              value: conn.weight
+              display: "block",
+              value: conn.weight,
+              connectionId: conn.id,
             })
 
             inputRef.current.focus()
           }}
           height={24}
           width={24}
-          fill={'#4a5565'}
+          fill={'#4a556900'}
           // fill={'red'}
           x={xPosi - 9}
           y={yPosi - 6}
@@ -243,21 +247,30 @@ function NodeGraph() {
           text-white bg-gray-600 font-bold border-2 border-white text-center
           text-[12px]`}
         onChange={(e) => {
-          console.log(e.target.value)
+          // console.log(e.target.value)
           setInputState({
             ...inputState,
             value: e.target.value,
           })
+
+          var connId = inputState.connectionId
+
+          setConnections({
+            ...connections,
+            [connId]: {
+              ...connections[connId],
+              weight: e.target.value,
+            }
+          })
         }
-        }
+      }
+
         autoFocus
-        onSU
         placeholder={inputState.value}
         style={{
           top: inputState.y - 18,
           left: inputState.x - 18,
-          position: inputState.position,
-          
+          display: inputState.display,
         }}
       />
       <div className='absolute m-5 top-0 left-0 gap-10 flex w-fit'>
