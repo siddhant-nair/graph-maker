@@ -9,12 +9,13 @@ function NodeGraph() {
   const [selectedNode, setSelectedNode] = useState(null)
   const [connectionMode, setConnectionMode] = useState(false)
   const [deletionMode, setDeletionMode] = useState(false)
+  const [weightMode, setWeightMode] = useState(false)
 
   const [connectionHovered, setConnectionHovered] = useState(false)
   const [inputState, setInputState] = useState({
-    x: 0, y: 0, 
-    display: "none", 
-    value: 0, 
+    x: 0, y: 0,
+    display: "none",
+    value: 0,
     connectionId: '0-0',
   })
 
@@ -47,6 +48,15 @@ function NodeGraph() {
 
   }
 
+  function resetModes(){
+      setInputState({ x: 0, y: 0, display: "none", value: "", connectionId: null })
+      inputRef.current.value = null
+      setWeightMode(false)
+      setConnectionMode(false)
+      setSelectedNode(null)
+      setDeletionMode(false)
+  }
+
   useEffect(() => {
     window.addEventListener('keydown', toggleModes)
 
@@ -56,25 +66,23 @@ function NodeGraph() {
   }, [])
 
   function handleStageClick(e) {
-    // console.log(e.target, e.currentTarget)
+    console.log(selectedNode)
     if (e.target !== e.currentTarget) {
       return;
     }
 
-    if (!connectionMode && !deletionMode) {
+
+    if (!connectionMode && !deletionMode && !weightMode) {
       const stage = stageRef.current;
       const pointerPosition = stage.getPointerPosition();
       createNode(pointerPosition.x, pointerPosition.y, nodes, setNodes);
     } else {
-      setInputState({x:0, y:0, display: "none", value: 0, connectionId: null})
-      setConnectionMode(false)
-      setSelectedNode(null)
-      setDeletionMode(false)
+      resetModes()
     }
   };
 
   function handleNodeClick(nodeId) {
-    console.log(deletionMode)
+    // console.log(deletionMode)
     // if(!connectionMode && !deletionMode){
     //   return
     // }
@@ -108,8 +116,6 @@ function NodeGraph() {
       else {
         deleteNode(nodeId, connections, setConnections, nodes, setNodes)
         setSelectedNode(null)
-        console.log(nodes)
-        console.log(connections)
       }
     }
   }
@@ -167,61 +173,62 @@ function NodeGraph() {
       let isHovered = connectionHovered == conn.id
 
       return (
-      <Group
-        key={conn.id}
+        <Group
+          key={conn.id}
         // onClick={() => console.log('clicked text')}
         >
-        <Rect
-          onMouseOver={() => {
-            setConnectionHovered(conn.id)
-            // console.log('hover triggered')
-          }}
-          onMouseLeave={() => {
-            setConnectionHovered(null)
-            // console.log('hover triggered')
-          }}
-
-          onClick={(e) => {
-            console.log(e)
-            // console.log(e.evt.clientX, e.evt.clientY)
-            setInputState({
-              x: e.evt.clientX,
-              y: e.evt.clientY,
-              display: "block",
-              value: conn.weight,
-              connectionId: conn.id,
-            })
-
-            inputRef.current.focus()
-          }}
-          height={24}
-          width={24}
-          fill={'#4a556900'}
-          // fill={'red'}
-          x={xPosi - 9}
-          y={yPosi - 6}
-        />
-        <Line
-          key={conn.id}
-          points={[nodes[conn.from].x, nodes[conn.from].y, nodes[conn.to].x, nodes[conn.to].y]}
-          stroke={conn.stroke}
-          strokeWidth={conn.strokeWidth}
+          <Line
+            key={conn.id}
+            points={[nodes[conn.from].x, nodes[conn.from].y, nodes[conn.to].x, nodes[conn.to].y]}
+            stroke={conn.stroke}
+            strokeWidth={conn.strokeWidth}
           />
-        <Text
-          text={conn.weight.toString()}
-          fontSize={isHovered ? 24 : 12}
-          fill="white"
-          fontVariant='bold'
-          x={xPosi - (isHovered ? 3 : 0)}
-          y={yPosi - (isHovered ? 6 : 0)}
-          listening={false}
-        />
-      </Group>
+          <Rect
+            onMouseOver={() => {
+              setConnectionHovered(conn.id)
+              // console.log('hover triggered')
+            }}
+            onMouseLeave={() => {
+              setConnectionHovered(null)
+              // console.log('hover triggered')
+            }}
+
+            onClick={(e) => {
+              console.log(e)
+              // console.log(e.evt.clientX, e.evt.clientY)
+              setWeightMode(true)
+              setInputState({
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                display: "block",
+                value: conn.weight,
+                connectionId: conn.id,
+              })
+              inputRef.current.focus()
+
+            }}
+            height={30}
+            width={30}
+            fill={'#4a556900'}
+            // fill={'red'}
+            x={xPosi - 7}
+            y={yPosi - 8}
+          />
+          <Text
+            text={conn.weight.toString()}
+            fontSize={isHovered ? 26 : 14}
+            fill="white"
+            fontVariant='bold'
+            x={xPosi - (isHovered ? 3 : 0)}
+            y={yPosi - (isHovered ? 6 : 0)}
+            listening={false}
+          />
+        </Group>
+      )
+    }
     )
   }
-    )
-  }
-  
+
   return (
     <>
       <Stage
@@ -242,37 +249,54 @@ function NodeGraph() {
       </Stage>
 
       {/* Non Canvas */}
-      <input type="number" name="weight-input" ref={inputRef}
-        className={`absolute origin-center w-[36px] h-[36px] 
+      <form onSubmit={(e) => {
+        e.preventDefault();
+
+        resetModes()
+      }}>
+        <input type="number" name="weight-input" ref={inputRef}
+          className={`absolute origin-center w-[36px] h-[36px] 
           text-white bg-gray-600 font-bold border-2 border-white text-center
           text-[12px]`}
-        onChange={(e) => {
-          // console.log(e.target.value)
-          setInputState({
-            ...inputState,
-            value: e.target.value,
-          })
+          onChange={(e) => {
+            console.log(inputRef.current.value)
 
-          var connId = inputState.connectionId
+            // if (!/[0-9.]/.test(e.key)) {
+            //   e.preventDefault();
+            //   return
+            // }
 
-          setConnections({
-            ...connections,
-            [connId]: {
-              ...connections[connId],
-              weight: e.target.value,
-            }
-          })
-        }
-      }
+            const re = /^[0-9\b]+$/;
 
-        autoFocus
-        placeholder={inputState.value}
-        style={{
-          top: inputState.y - 18,
-          left: inputState.x - 18,
-          display: inputState.display,
-        }}
-      />
+            const sanitized = e.target.value.replace(/\D/g, "");
+
+            setInputState({
+              ...inputState,
+              value: sanitized,
+            })
+
+            var connId = inputState.connectionId
+
+            setConnections({
+              ...connections,
+              [connId]: {
+                ...connections[connId],
+                weight: sanitized,
+              }
+            })
+          }}
+
+          // value={inputState.value}
+          inputMode='numeric'
+          pattern="[0-9]*"
+          placeholder={inputState.value}
+          style={{
+            top: inputState.y - 18,
+            left: inputState.x - 18,
+            display: inputState.display,
+          }}
+        />
+      </form>
       <div className='absolute m-5 top-0 left-0 gap-10 flex w-fit'>
         <div className='flex flex-col gap-2 text-center items-center'
           onClick={toggleConnectionMode}

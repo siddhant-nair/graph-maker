@@ -1,6 +1,6 @@
 export function createNode(x, y, nodes, setNodes) {
-    const newNodeId = Object.keys(nodes).length;
-    // console.log(nodes)
+    const newNodeId = Math.max(Math.max( ...Object.keys(nodes) ) + 1, 0);
+    // console.log()
     const newNode = {
         id: newNodeId,
         x: x,
