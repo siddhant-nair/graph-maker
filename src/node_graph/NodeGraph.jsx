@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Circle, Group, Text, Line, Rect } from 'react-konva';
 import { createNode, deleteNode, handleNodeDrag, nodeSelectionTween } from './node_utils/nodeFunctions';
-import { handleAddConnection } from './connection_utils/connectionFunctions';
+import { handleAddConnection, updateWeights } from './connection_utils/connectionFunctions';
 
 function NodeGraph() {
   const [nodes, setNodes] = useState({});
@@ -16,6 +16,7 @@ function NodeGraph() {
     x: 0, y: 0,
     display: "none",
     value: 0,
+    displayValue: 0,
     connectionId: '0-0',
   })
 
@@ -37,20 +38,25 @@ function NodeGraph() {
   }
 
   function toggleModes(e) {
+   
+      if (e.key == 'Escape') {
+        resetModes()
+      }
 
-    if (e.key == 'a') {
-      toggleConnectionMode()
+    if (!weightMode) {
+      if (e.key == 'a') {
+        toggleConnectionMode()
+      }
+
+      if (e.key == 'd') {
+        toggleDeletionMode()
+      }
     }
-
-    if (e.key == 'd') {
-      toggleDeletionMode()
-    }
-
   }
 
   function resetModes(){
-      setInputState({ x: 0, y: 0, display: "none", value: "", connectionId: null })
-      inputRef.current.value = null
+      setInputState({ x: 0, y: 0, display: "none", value: "", displayValue: 0, connectionId: null })
+      
       setWeightMode(false)
       setConnectionMode(false)
       setSelectedNode(null)
@@ -82,11 +88,7 @@ function NodeGraph() {
   };
 
   function handleNodeClick(nodeId) {
-    // console.log(deletionMode)
-    // if(!connectionMode && !deletionMode){
-    //   return
-    // }
-
+    
     if (!deletionMode) {
       if (!connectionMode) {
         toggleConnectionMode()
@@ -98,10 +100,13 @@ function NodeGraph() {
           handleAddConnection(
             selectedNode,
             nodeId,
-            connections,
-            setConnections,
-            nodes,
-            setNodes
+
+            {
+              connections,
+              setConnections,
+              nodes,
+              setNodes
+            }
           )
           setSelectedNode(nodeId)
         }
@@ -167,10 +172,12 @@ function NodeGraph() {
     // console.log(connections)
     // return connections.map(conn => {
     return Object.entries(connections).map(([id, conn]) => {
-      let xPosi = (nodes[conn.from].x + nodes[conn.to].x) / 2
-      let yPosi = (nodes[conn.from].y + nodes[conn.to].y) / 2 - 15
+      const xPosi = (nodes[conn.from].x + nodes[conn.to].x) / 2
+      const yPosi = (nodes[conn.from].y + nodes[conn.to].y) / 2 - 15
 
       let isHovered = connectionHovered == conn.id
+
+      let xOffset = (conn.weight.toString().length - 1) * 3
 
       return (
         <Group
@@ -198,8 +205,8 @@ function NodeGraph() {
               // console.log(e.evt.clientX, e.evt.clientY)
               setWeightMode(true)
               setInputState({
-                x: e.evt.clientX,
-                y: e.evt.clientY,
+                x: xPosi,
+                y: yPosi + 10,
                 display: "block",
                 value: conn.weight,
                 connectionId: conn.id,
@@ -209,8 +216,8 @@ function NodeGraph() {
             }}
             height={30}
             width={30}
-            fill={'#4a556900'}
-            // fill={'red'}
+            // fill={'#4a556900'}
+            fill={'red'}
             x={xPosi - 7}
             y={yPosi - 8}
           />
@@ -219,7 +226,7 @@ function NodeGraph() {
             fontSize={isHovered ? 26 : 14}
             fill="white"
             fontVariant='bold'
-            x={xPosi - (isHovered ? 3 : 0)}
+            x={xPosi - (isHovered ? 2 + xOffset : 0) - xOffset}
             y={yPosi - (isHovered ? 6 : 0)}
             listening={false}
           />
@@ -254,42 +261,18 @@ function NodeGraph() {
 
         resetModes()
       }}>
-        <input type="number" name="weight-input" ref={inputRef}
-          className={`absolute origin-center w-[36px] h-[36px] 
+        <input type="text" name="weight-input" ref={inputRef}
+          className={`absolute origin-center w-fit max-w-[50px] h-[36px] 
           text-white bg-gray-600 font-bold border-2 border-white text-center
           text-[12px]`}
+
           onChange={(e) => {
-            console.log(inputRef.current.value)
-
-            // if (!/[0-9.]/.test(e.key)) {
-            //   e.preventDefault();
-            //   return
-            // }
-
-            const re = /^[0-9\b]+$/;
-
-            const sanitized = e.target.value.replace(/\D/g, "");
-
-            setInputState({
-              ...inputState,
-              value: sanitized,
-            })
-
-            var connId = inputState.connectionId
-
-            setConnections({
-              ...connections,
-              [connId]: {
-                ...connections[connId],
-                weight: sanitized,
-              }
-            })
+            updateWeights(e, { setInputState, inputState, setConnections, connections })
           }}
 
-          // value={inputState.value}
-          inputMode='numeric'
-          pattern="[0-9]*"
-          placeholder={inputState.value}
+          value={inputState.value}
+          placeholder={inputState.displayValue}
+
           style={{
             top: inputState.y - 18,
             left: inputState.x - 18,

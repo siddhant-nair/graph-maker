@@ -1,10 +1,12 @@
 export function handleAddConnection(
     fromId,
     toId,
-    connections,
-    setConnections,
-    nodes,
-    setNodes
+    {
+        connections,
+        setConnections,
+        nodes,
+        setNodes
+    }
 ) {
     if (connections.hasOwnProperty(`${fromId}-${toId}`) ||
         connections.hasOwnProperty(`${toId}-${fromId}`)) {
@@ -66,4 +68,35 @@ export function handleAddConnection(
 
 export function setConnectionWeight(){
     
+}
+
+export function updateWeights(
+    evt,
+    {
+        setInputState,
+        inputState,
+        setConnections,
+        connections,
+    }
+) {
+    const sanitized = evt.target.value.replace(/\D/g, '');
+
+    setInputState({
+        ...inputState,
+        value: sanitized,
+    })
+
+    var connId = inputState.connectionId
+
+    setConnections({
+        ...connections,
+        [connId]: {
+            ...connections[connId],
+            weight: sanitized || 0,
+        }
+    })
+}
+
+export function handleOnBlur() {
+    set
 }
