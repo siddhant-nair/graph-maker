@@ -39,9 +39,16 @@ function NodeGraph() {
 
   function toggleModes(e) {
    
-      if (e.key == 'Escape') {
-        resetModes()
-      }
+    if (e.key == 'Escape') {
+      resetModes()
+    }
+
+    // console.log(e.key)
+
+    // if(e.key == '`'){
+    //   console.log(nodes)
+    //   console.log(connections)
+    // }
 
     if (!weightMode) {
       if (e.key == 'a') {
@@ -64,19 +71,20 @@ function NodeGraph() {
   }
 
   useEffect(() => {
+
     window.addEventListener('keydown', toggleModes)
 
     return () => {
       window.removeEventListener('keydown', toggleModes)
     };
+
   }, [])
 
   function handleStageClick(e) {
-    console.log(selectedNode)
+    // console.log(selectedNode)
     if (e.target !== e.currentTarget) {
       return;
     }
-
 
     if (!connectionMode && !deletionMode && !weightMode) {
       const stage = stageRef.current;
@@ -93,6 +101,7 @@ function NodeGraph() {
       if (!connectionMode) {
         toggleConnectionMode()
       }
+
       if (selectedNode === null) {
         setSelectedNode(nodeId)
       } else {
@@ -114,7 +123,7 @@ function NodeGraph() {
     }
 
     if (deletionMode) {
-      console.log('deletionMode')
+      // console.log('deletionMode')
       if (selectedNode == null || selectedNode != nodeId) {
         setSelectedNode(nodeId)
       }
@@ -201,7 +210,7 @@ function NodeGraph() {
             }}
 
             onClick={(e) => {
-              console.log(e)
+              // console.log(e)
               // console.log(e.evt.clientX, e.evt.clientY)
               setWeightMode(true)
               setInputState({
@@ -217,7 +226,7 @@ function NodeGraph() {
             height={30}
             width={30}
             // fill={'#4a556900'}
-            fill={'red'}
+            // fill={'red'}
             x={xPosi - 7}
             y={yPosi - 8}
           />
@@ -273,6 +282,8 @@ function NodeGraph() {
           value={inputState.value}
           placeholder={inputState.displayValue}
 
+          autoComplete={'off'}
+
           style={{
             top: inputState.y - 18,
             left: inputState.x - 18,
@@ -280,7 +291,7 @@ function NodeGraph() {
           }}
         />
       </form>
-      <div className='absolute m-5 top-0 left-0 gap-10 flex w-fit'>
+      <div className='absolute m-5 top-0 left-0 gap-10 flex w-fit items-center'>
         <div className='flex flex-col gap-2 text-center items-center'
           onClick={toggleConnectionMode}
         >
@@ -293,6 +304,14 @@ function NodeGraph() {
           <div className={`size-7 ${deletionMode ? 'bg-green-500' : 'bg-red-600'}  rounded-full`}></div>
           <div className='text-sm text-white'>Deletion <br /> {deletionMode ? 'On' : 'Off'} (d)</div>
         </div>
+        <button
+        className='cursor-pointer text-sm h-fit text-white p-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition'
+          onClick={() => {
+            console.log(nodes)
+            console.log(connections)
+          }}
+        > Log States
+        </button>
       </div>
     </>
   );

@@ -79,7 +79,7 @@ export function updateWeights(
         connections,
     }
 ) {
-    const sanitized = evt.target.value.replace(/\D/g, '');
+    const sanitized = Number( evt.target.value.replace(/\D/g, '') );
 
     setInputState({
         ...inputState,
@@ -97,6 +97,6 @@ export function updateWeights(
     })
 }
 
-export function handleOnBlur() {
-    set
-}
+// export function handleOnBlur() {
+//     set
+// }

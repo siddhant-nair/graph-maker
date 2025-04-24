@@ -1,4 +1,4 @@
-import NodeGraph from './node_graph/NodeGraph'
+import NodeGraph from './node_graph/NodeGraph.jsx'
 
 function App() {
 
