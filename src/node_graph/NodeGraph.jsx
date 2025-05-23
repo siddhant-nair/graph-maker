@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Circle, Group, Text, Line, Rect } from 'react-konva';
 import { createNode, deleteNode, handleNodeDrag, nodeSelectionTween } from './node_utils/nodeFunctions';
 import { handleAddConnection, updateWeights } from './connection_utils/connectionFunctions';
+import { createMatrix } from './matrixGeneration';
 
 function NodeGraph() {
   const [nodes, setNodes] = useState({});
@@ -307,10 +308,9 @@ function NodeGraph() {
         <button
         className='cursor-pointer text-sm h-fit text-white p-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition'
           onClick={() => {
-            console.log(nodes)
-            console.log(connections)
+            createMatrix(connections)
           }}
-        > Log States
+        > Log Matrix
         </button>
       </div>
     </>
